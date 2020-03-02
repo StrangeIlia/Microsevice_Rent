@@ -1,9 +1,10 @@
-package bstu.BI.web.dto;
+package bstu.BI.web.v1.dto;
 
 import bstu.BI.entity.enums.Status;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
+//@Getter
 public class UserOperation {
     private Status status;
     private Integer userId;

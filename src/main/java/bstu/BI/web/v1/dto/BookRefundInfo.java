@@ -1,4 +1,4 @@
-package bstu.BI.web.dto;
+package bstu.BI.web.v1.dto;
 
 import lombok.Getter;
 

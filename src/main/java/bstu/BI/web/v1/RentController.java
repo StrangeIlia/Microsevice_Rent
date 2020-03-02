@@ -1,26 +1,23 @@
-package bstu.BI.web;
+package bstu.BI.web.v1;
 
 import bstu.BI.entity.domain.RentalTicket;
-import bstu.BI.service.BookService;
-import bstu.BI.service.RentalTickerService;
-import bstu.BI.service.UserService;
+import bstu.BI.service.v1.BookService;
+import bstu.BI.service.v1.RentalTickerService;
+import bstu.BI.service.v1.UserService;
 import bstu.BI.util.Appriser;
-import bstu.BI.web.dto.ListOfOrders;
-import bstu.BI.web.dto.UserOperation;
-import bstu.BI.web.dto.UserRequisites;
-import bstu.BI.web.dto.UserResponse;
+import bstu.BI.web.v1.dto.ListOfOrders;
+import bstu.BI.web.v1.dto.UserOperation;
+import bstu.BI.web.v1.dto.UserRequisites;
+import bstu.BI.web.v1.dto.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/book/rent")
+@RequestMapping("api/rent/v1")
 public class RentController {
     @Autowired
     UserService userService;
@@ -30,7 +27,9 @@ public class RentController {
     RentalTickerService tickerService;
 
     @PostMapping("/order")
-    public UserResponse rentBook(UserRequisites requisites, Integer bookTypeId, Date rentalPeriod) {
+    public UserResponse rentBook(@RequestParam UserRequisites requisites,
+                                 @RequestParam Integer bookTypeId,
+                                 @RequestParam Date rentalPeriod) {
         Optional<RentalTicket> optionalRentalTicket = bookService.startTransaction(bookTypeId);
         if (optionalRentalTicket.isEmpty())
             return UserResponse.error("Ошибка: не удалось найти книгу такого типа");
@@ -39,8 +38,7 @@ public class RentController {
         if (transaction.isFail())
             return UserResponse.error(transaction.getExplanation());
         rentalTicket.setUserId(transaction.getUserId());
-        rentalTicket.setRentPrice(Appriser.getCostRent(rentalPeriod, rentalTicket.getRentPrice()));
-        rentalTicket.setRentalPeriod(rentalPeriod);
+        rentalTicket.setRentalFinish(rentalPeriod);
         tickerService.save(rentalTicket);
         bookService.finishTransaction(rentalTicket);
         return UserResponse.success();

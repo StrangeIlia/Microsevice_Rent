@@ -1,4 +1,4 @@
-package bstu.BI.service;
+package bstu.BI.service.v1;
 
 import bstu.BI.entity.domain.RentalTicket;
 

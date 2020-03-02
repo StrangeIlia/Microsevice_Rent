@@ -1,7 +1,7 @@
-package bstu.BI.service;
+package bstu.BI.service.v1;
 
-import bstu.BI.web.dto.UserOperation;
-import bstu.BI.web.dto.UserRequisites;
+import bstu.BI.web.v1.dto.UserOperation;
+import bstu.BI.web.v1.dto.UserRequisites;
 
 public interface UserService {
     UserOperation getUserId(UserRequisites requisites);

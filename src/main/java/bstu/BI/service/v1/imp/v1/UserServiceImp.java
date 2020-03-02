@@ -1,8 +1,8 @@
-package bstu.BI.service.imp.v1;
+package bstu.BI.service.v1.imp.v1;
 
-import bstu.BI.service.UserService;
-import bstu.BI.web.dto.UserOperation;
-import bstu.BI.web.dto.UserRequisites;
+import bstu.BI.service.v1.UserService;
+import bstu.BI.web.v1.dto.UserOperation;
+import bstu.BI.web.v1.dto.UserRequisites;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

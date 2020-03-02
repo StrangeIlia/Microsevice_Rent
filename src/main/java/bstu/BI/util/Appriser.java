@@ -13,7 +13,12 @@ public class Appriser {
         return cost;
     }
 
-    public static double getCostRent(Date rentalPeriod, Double cost) {
+    public static double getCostRent(Double cost, Date rentalStart, Date rentalFinish) {
+        Date rentalPeriod = new Date(rentalStart.getTime() - rentalFinish.getTime());
+        return getCostRent(cost, rentalPeriod);
+    }
+
+    public static double getCostRent(Double cost, Date rentalPeriod) {
         long days = rentalPeriod.getTime() / (24 * 60 * 60 * 1000);
         return cost / 30 * days;
     }

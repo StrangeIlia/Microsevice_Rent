@@ -1,9 +1,9 @@
-package bstu.BI.service.imp.v1;
+package bstu.BI.service.v1.imp.v1;
 
 import bstu.BI.entity.domain.RentalTicket;
-import bstu.BI.service.BookService;
-import bstu.BI.web.dto.BookRefundInfo;
-import bstu.BI.web.dto.BookRentInfo;
+import bstu.BI.service.v1.BookService;
+import bstu.BI.web.v1.dto.BookRefundInfo;
+import bstu.BI.web.v1.dto.BookRentInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,7 +29,7 @@ public class BookServiceImp implements BookService {
         if (bookRentInfo.isFail())
             return Optional.empty();
         RentalTicket result = new RentalTicket();
-        result.setBookId(bookRentInfo.getId());
+        result.setBookTypeId(bookRentInfo.getId());
         result.setRentPrice(bookRentInfo.getRentPrice());
         result.setPurchasePrice(bookRentInfo.getPurchasePrice());
         return Optional.of(result);
@@ -39,7 +39,7 @@ public class BookServiceImp implements BookService {
     public void finishTransaction(RentalTicket rentalTicket) {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.put("api/books", new Object() {
-            Integer bookId = rentalTicket.getBookId();
+            Integer bookId = rentalTicket.getBookTypeId();
         });
     }
 
@@ -49,7 +49,7 @@ public class BookServiceImp implements BookService {
         Collection<Object> shippingBooks = new ArrayList<>(rentalTickets.size());
         for (RentalTicket rentalTicket : rentalTickets)
             shippingBooks.add(new Object() {
-                Integer id = rentalTicket.getBookId();
+                Integer id = rentalTicket.getBookTypeId();
             });
         ResponseEntity<ArrayList> responseEntity = restTemplate.getForEntity(
                 "api/books/returned", ArrayList.class, shippingBooks);
@@ -60,8 +60,8 @@ public class BookServiceImp implements BookService {
         for (Object obj : list) {
             BookRefundInfo bookRefundInfo = (BookRefundInfo) obj;
             for (RentalTicket ticket : rentalTickets) {
-                if (ticket.getBookId().equals(bookRefundInfo.getId())) {
-                    long max = ticket.getRentalStart().getTime() + ticket.getRentalPeriod().getTime();
+                if (ticket.getBookTypeId().equals(bookRefundInfo.getId())) {
+                    long max = ticket.getRentalStart().getTime() + ticket.getRentalFinish().getTime();
                     if (max >= bookRefundInfo.getReturnTime().getTime()) {
                         result.add(ticket);
                         break;
@@ -78,7 +78,7 @@ public class BookServiceImp implements BookService {
         Collection<Object> shippingBooks = new ArrayList<>(rentalTickets.size());
         for (RentalTicket rentalTicket : rentalTickets)
             shippingBooks.add(new Object() {
-                Integer id = rentalTicket.getBookId();
+                Integer id = rentalTicket.getBookTypeId();
             });
         restTemplate.put("api/books/clear", shippingBooks);
     }

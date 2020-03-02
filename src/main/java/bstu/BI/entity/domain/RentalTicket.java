@@ -17,7 +17,7 @@ public class RentalTicket {
     @Column(nullable = false)
     private Integer userId;
     @Column(nullable = false)
-    private Integer bookId;
+    private Integer bookTypeId;
     @Column(nullable = false)
     private Double rentPrice;
     @Column(nullable = false)
@@ -26,5 +26,5 @@ public class RentalTicket {
     @Temporal(TemporalType.TIMESTAMP)
     private Date rentalStart;
     @Column(nullable = false)
-    private Date rentalPeriod;
+    private Date rentalFinish;
 }

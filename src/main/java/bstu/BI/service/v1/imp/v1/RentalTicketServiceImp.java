@@ -1,8 +1,8 @@
-package bstu.BI.service.imp.v1;
+package bstu.BI.service.v1.imp.v1;
 
 import bstu.BI.entity.domain.RentalTicket;
 import bstu.BI.repository.RentalTickerRepository;
-import bstu.BI.service.RentalTickerService;
+import bstu.BI.service.v1.RentalTickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
