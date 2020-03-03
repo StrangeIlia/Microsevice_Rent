@@ -23,8 +23,9 @@ public class RentalTicket {
     @Column(nullable = false)
     private Double purchasePrice;
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date rentalStart;
+    @Temporal(TemporalType.DATE)
+    private Date rentalStart = new Date();
+    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date rentalFinish;
 }

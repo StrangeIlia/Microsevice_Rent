@@ -1,8 +1,8 @@
 package bstu.BI.util;
 
 import bstu.BI.entity.domain.RentalTicket;
-import bstu.BI.web.v2.dto.BookService_Response;
-import bstu.BI.web.v2.dto.BookService_TransactionInfo;
+import bstu.BI.web.dto.BookService_Response;
+import bstu.BI.web.dto.BookService_TransactionInfo;
 
 public class Converter {
     public static BookService_TransactionInfo convert(BookService_Response response) {

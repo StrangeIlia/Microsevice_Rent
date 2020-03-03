@@ -1,11 +1,11 @@
-package bstu.BI.service.v2.imp.v1;
+package bstu.BI.service.imp;
 
 import bstu.BI.entity.enums.BookService_Operation;
-import bstu.BI.service.v2.BookService;
-import bstu.BI.service.v2.ExternalBookService;
+import bstu.BI.service.BookService;
+import bstu.BI.service.ExternalBookService;
 import bstu.BI.util.Converter;
-import bstu.BI.web.v2.dto.BookService_Response;
-import bstu.BI.web.v2.dto.BookService_TransactionInfo;
+import bstu.BI.web.dto.BookService_Response;
+import bstu.BI.web.dto.BookService_TransactionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

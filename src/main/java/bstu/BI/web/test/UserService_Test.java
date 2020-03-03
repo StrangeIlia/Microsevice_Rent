@@ -1,10 +1,12 @@
 package bstu.BI.web.test;
 
 import bstu.BI.entity.enums.Status;
-import bstu.BI.web.v1.dto.UserOperation;
-import bstu.BI.web.v1.dto.UserRequisites;
+import bstu.BI.web.dto.DTO_UserService_Transaction;
+import bstu.BI.web.dto.UserOperation;
+import bstu.BI.web.dto.UserRequisites;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -23,12 +25,13 @@ public class UserService_Test {
     }
 
     @GetMapping("/info")
-    public UserOperation getInfo(@RequestParam UserRequisites requisites) {
-        Integer id = userRequisites.get(requisites.getUsername());
+    public UserOperation getInfo(@RequestParam String username) {
+        this.init();
+        Integer id = userRequisites.get(username);
         UserOperation userOperation = new UserOperation();
         if (Optional.ofNullable(id).isEmpty()) {
             userOperation.setStatus(Status.FAIL);
-            userOperation.setExplanation("Нет пользоателя с таким логином");
+            userOperation.setExplanation("Нет пользователя с таким логином");
         } else {
             userOperation.setStatus(Status.SUCCESS);
             userOperation.setUserId(id);
@@ -37,13 +40,15 @@ public class UserService_Test {
     }
 
     @PostMapping("/transactions")
-    public UserOperation transactions(@RequestParam UserRequisites requisites,
-                                      @RequestParam Double cost) {
+    public UserOperation transactions(@RequestBody @Valid DTO_UserService_Transaction data) {
+        UserRequisites requisites = data.getRequisites();
+        Double cost = data.getCost();
+        this.init();
         Integer id = userRequisites.get(requisites.getUsername());
         UserOperation userOperation = new UserOperation();
         if (Optional.ofNullable(id).isEmpty()) {
             userOperation.setStatus(Status.FAIL);
-            userOperation.setExplanation("Нет пользоателя с таким логином");
+            userOperation.setExplanation("Нет пользователя с таким логином");
         } else {
             userOperation.setStatus(Status.SUCCESS);
             userOperation.setUserId(id);

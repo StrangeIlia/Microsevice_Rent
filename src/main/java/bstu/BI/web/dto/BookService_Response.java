@@ -1,4 +1,4 @@
-package bstu.BI.web.v2.dto;
+package bstu.BI.web.dto;
 
 import bstu.BI.entity.enums.Status;
 import lombok.Data;

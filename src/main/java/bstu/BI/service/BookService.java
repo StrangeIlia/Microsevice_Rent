@@ -1,6 +1,6 @@
-package bstu.BI.service.v2;
+package bstu.BI.service;
 
-import bstu.BI.web.v2.dto.BookService_TransactionInfo;
+import bstu.BI.web.dto.BookService_TransactionInfo;
 
 import java.util.Optional;
 

@@ -2,7 +2,7 @@ package bstu.BI.web.test;
 
 import bstu.BI.entity.enums.BookService_Operation;
 import bstu.BI.entity.enums.Status;
-import bstu.BI.web.v2.dto.BookService_Response;
+import bstu.BI.web.dto.BookService_Response;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Random;
