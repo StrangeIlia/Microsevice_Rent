@@ -1,0 +1,22 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=Ilia_24998
+      - MYSQL_DATABASE=microservice_rent
+      - MYSQL_USER=ilya
+      - MYSQL_PASSWORD=secret
+    ports:
+      - "3308:3306"
+    restart: always
+
+  rent:
+    image: rent_service
+    build: ./src
+    restart: on-failure
+    depends_on:
+      - mysql
+    ports:
+      - "50001:50001"
