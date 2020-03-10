@@ -53,15 +53,26 @@ public class RentController {
         UserOperation userOperation = userService.getInfo(requisites.getUsername());
         if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
         Collection<RentalTicket> rentalBooks = tickerService.findByUserId(userOperation.getUserId());
-        Optional<RentalTicket> optionalRentalTicket = rentalBooks.stream()
+        RentalTicket[] massive = (RentalTicket[]) rentalBooks.stream()
                 .filter(x -> x.getBookTypeId().equals(bookTypeId))
-                .min(Comparator.comparing(RentalTicket::getRentalFinish));
+                .sorted(Comparator.comparing(RentalTicket::getRentalFinish))
+                .toArray();
+        Optional<RentalTicket> optionalRentalTicket = Optional.empty();
+        Date currentDate = new Date();
+        for (RentalTicket ticket : massive) {
+            if (currentDate.compareTo(ticket.getRentalFinish()) <= 0)
+                tickerService.delete(ticket);
+            else {
+                optionalRentalTicket = Optional.of(ticket);
+                break;
+            }
+        }
         if (optionalRentalTicket.isEmpty()) return UserResponse.error("Ошибка: не найден заказ с такой книгой");
-        RentalTicket rentalTicket = optionalRentalTicket.get();
-        userOperation = userService.transactions(requisites, rentalTicket.getPurchasePrice() - rentalTicket.getRentPrice());
+        userOperation = userService.transactions(requisites,
+                optionalRentalTicket.get().getPurchasePrice() - optionalRentalTicket.get().getRentPrice());
         if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
-        bookService.bookReturn(rentalTicket.getBookTypeId());
-        tickerService.delete(rentalTicket);
+        bookService.bookReturn(optionalRentalTicket.get().getBookTypeId());
+        tickerService.delete(optionalRentalTicket.get());
         return UserResponse.success();
     }
 
