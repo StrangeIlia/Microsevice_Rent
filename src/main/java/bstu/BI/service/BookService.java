@@ -1,13 +1,11 @@
 package bstu.BI.service;
 
-import bstu.BI.web.dto.BookService_TransactionInfo;
+import bstu.BI.entity.domain.RentalTicket;
 
 import java.util.Optional;
 
 public interface BookService {
-    Optional<BookService_TransactionInfo> startTransaction(Integer bookTypeId);
+    Optional<RentalTicket> buyOne(Long bookTypeId);
 
-    void finishTransaction(BookService_TransactionInfo transactionInfo);
-
-    void bookReturn(Integer bookTypeId);
+    boolean returnOne(Long bookTypeId);
 }

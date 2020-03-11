@@ -10,7 +10,7 @@ public class DTO_Rent_CreateOrder {
     @NotNull
     UserRequisites requisites;
     @NotNull
-    Integer bookTypeId;
+    Long bookTypeId;
     @NotNull
     Date rentalFinish;
 }

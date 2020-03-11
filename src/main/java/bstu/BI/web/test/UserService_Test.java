@@ -13,21 +13,21 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/test/user-service")
 public class UserService_Test {
-    HashMap<String, Integer> userRequisites = null;
+    HashMap<String, Long> userRequisites = null;
 
     private void init() {
         if (Optional.ofNullable(userRequisites).isEmpty()) {
             userRequisites = new HashMap<>(3);
-            userRequisites.put("Пользователь", 1);
-            userRequisites.put("Админ", 2);
-            userRequisites.put("Гость", 3);
+            userRequisites.put("Пользователь", 1L);
+            userRequisites.put("Админ", 2L);
+            userRequisites.put("Гость", 3L);
         }
     }
 
     @GetMapping("/info")
     public UserOperation getInfo(@RequestParam String username) {
         this.init();
-        Integer id = userRequisites.get(username);
+        Long id = userRequisites.get(username);
         UserOperation userOperation = new UserOperation();
         if (Optional.ofNullable(id).isEmpty()) {
             userOperation.setStatus(Status.FAIL);
@@ -39,12 +39,12 @@ public class UserService_Test {
         return userOperation;
     }
 
-    @PostMapping("/transactions")
+    @PutMapping("/transactions")
     public UserOperation transactions(@RequestBody @Valid DTO_UserService_Transaction data) {
         UserRequisites requisites = data.getRequisites();
         Double cost = data.getCost();
         this.init();
-        Integer id = userRequisites.get(requisites.getUsername());
+        Long id = userRequisites.get(requisites.getUsername());
         UserOperation userOperation = new UserOperation();
         if (Optional.ofNullable(id).isEmpty()) {
             userOperation.setStatus(Status.FAIL);

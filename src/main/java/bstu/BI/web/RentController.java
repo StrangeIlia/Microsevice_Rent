@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/rent-service/v2")
@@ -25,42 +22,46 @@ public class RentController {
     @Autowired
     RentalTickerService tickerService;
 
-    @PostMapping("/create-order")
+    @PutMapping("/create-order")
     public UserResponse createOrder(@RequestBody @Valid DTO_Rent_CreateOrder data) {
         UserRequisites requisites = data.getRequisites();
-        Integer bookTypeId = data.getBookTypeId();
+        Long bookTypeId = data.getBookTypeId();
         Date rentalFinish = data.getRentalFinish();
         if (!Verificator.validPeriod(new Date(), rentalFinish))
             return UserResponse.error("Ошибка: период не может быть отрицательным или превышать месяц");
-        Optional<BookService_TransactionInfo> infoOptional = bookService.startTransaction(bookTypeId);
+        Optional<RentalTicket> infoOptional = bookService.buyOne(bookTypeId);
         if (infoOptional.isEmpty()) return UserResponse.error("Ошибка: не удалось найти книгу такого типа");
-        BookService_TransactionInfo info = infoOptional.get();
-        RentalTicket rentalTicket = info.getRentalTicket();
+        RentalTicket rentalTicket = infoOptional.get();
         UserOperation userOperation = userService.transactions(requisites, -rentalTicket.getPurchasePrice());
-        if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
+        if (userOperation.isFail()) {
+            bookService.returnOne(bookTypeId);
+            return UserResponse.error(userOperation.getExplanation());
+        }
         rentalTicket.setBookTypeId(bookTypeId);
         rentalTicket.setRentalFinish(rentalFinish);
         rentalTicket.setUserId(userOperation.getUserId());
         tickerService.save(rentalTicket);
-        bookService.finishTransaction(info);
         return UserResponse.success();
     }
 
-    @PostMapping("/refund-of-deposit")
+    @PutMapping("/refund-of-deposit")
     public UserResponse refundOfDeposit(@RequestBody @Valid DTO_Rent_RefundOfDeposit data) {
         UserRequisites requisites = data.getRequisites();
-        Integer bookTypeId = data.getBookTypeId();
+        Long bookTypeId = data.getBookTypeId();
         UserOperation userOperation = userService.getInfo(requisites.getUsername());
         if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
         Collection<RentalTicket> rentalBooks = tickerService.findByUserId(userOperation.getUserId());
-        RentalTicket[] massive = (RentalTicket[]) rentalBooks.stream()
+        Iterator<RentalTicket> iterator = rentalBooks.stream()
                 .filter(x -> x.getBookTypeId().equals(bookTypeId))
                 .sorted(Comparator.comparing(RentalTicket::getRentalFinish))
-                .toArray();
+                .iterator();
         Optional<RentalTicket> optionalRentalTicket = Optional.empty();
         Date currentDate = new Date();
-        for (RentalTicket ticket : massive) {
-            if (currentDate.compareTo(ticket.getRentalFinish()) <= 0)
+        while (iterator.hasNext()) {
+            RentalTicket ticket = iterator.next();
+            Date finish = ticket.getRentalFinish();
+            int result = currentDate.compareTo(finish);
+            if (result > 0)
                 tickerService.delete(ticket);
             else {
                 optionalRentalTicket = Optional.of(ticket);
@@ -71,7 +72,7 @@ public class RentController {
         userOperation = userService.transactions(requisites,
                 optionalRentalTicket.get().getPurchasePrice() - optionalRentalTicket.get().getRentPrice());
         if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
-        bookService.bookReturn(optionalRentalTicket.get().getBookTypeId());
+        bookService.returnOne(optionalRentalTicket.get().getBookTypeId());
         tickerService.delete(optionalRentalTicket.get());
         return UserResponse.success();
     }

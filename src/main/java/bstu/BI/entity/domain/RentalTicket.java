@@ -15,9 +15,9 @@ public class RentalTicket {
     private Integer id;
     @JsonIgnore
     @Column(nullable = false)
-    private Integer userId;
+    private Long userId;
     @Column(nullable = false)
-    private Integer bookTypeId;
+    private Long bookTypeId;
     @Column(nullable = false)
     private Double rentPrice;
     @Column(nullable = false)

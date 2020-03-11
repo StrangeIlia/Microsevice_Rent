@@ -20,7 +20,7 @@ public class RentalTicketServiceImp implements RentalTickerService {
     }
 
     @Override
-    public Collection<RentalTicket> findByUserId(Integer userId) {
+    public Collection<RentalTicket> findByUserId(Long userId) {
         return tickerRepository.findByUserId(userId);
     }
 

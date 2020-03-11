@@ -8,7 +8,7 @@ import lombok.Data;
 //@Getter
 public class UserOperation {
     private Status status;
-    private Integer userId;
+    private Long userId;
     private String explanation;
 
     @JsonIgnore

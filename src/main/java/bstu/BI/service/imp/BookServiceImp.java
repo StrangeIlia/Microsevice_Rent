@@ -1,11 +1,10 @@
 package bstu.BI.service.imp;
 
-import bstu.BI.entity.enums.BookService_Operation;
+import bstu.BI.entity.domain.RentalTicket;
 import bstu.BI.service.BookService;
 import bstu.BI.service.ExternalBookService;
-import bstu.BI.util.Converter;
 import bstu.BI.web.dto.BookService_Response;
-import bstu.BI.web.dto.BookService_TransactionInfo;
+import bstu.BI.web.dto.DTO_RentBook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +16,20 @@ public class BookServiceImp implements BookService {
     ExternalBookService externalBookService;
 
     @Override
-    public Optional<BookService_TransactionInfo> startTransaction(Integer bookTypeId) {
-        BookService_Response response = externalBookService.operation(bookTypeId, BookService_Operation.GET_BOOK);
-        return Optional.ofNullable(Converter.convert(response));
+    public Optional<RentalTicket> buyOne(Long bookTypeId) {
+        DTO_RentBook rentBook = new DTO_RentBook(bookTypeId, -1L);
+        BookService_Response response = externalBookService.operation(rentBook);
+        RentalTicket ticket = new RentalTicket();
+        ticket.setBookTypeId(bookTypeId);
+        ticket.setRentPrice(response.getRentPrice());
+        ticket.setPurchasePrice(response.getPurchasePrice());
+        return Optional.of(ticket);
     }
 
     @Override
-    public void finishTransaction(BookService_TransactionInfo transactionInfo) {
-        externalBookService.transaction(transactionInfo.getTransactionId());
-    }
-
-    @Override
-    public void bookReturn(Integer bookTypeId) {
-        externalBookService.operation(bookTypeId, BookService_Operation.PUSH_BOOK);
+    public boolean returnOne(Long bookTypeId) {
+        DTO_RentBook rentBook = new DTO_RentBook(bookTypeId, 1L);
+        BookService_Response response = externalBookService.operation(rentBook);
+        return response.isSuccess();
     }
 }
