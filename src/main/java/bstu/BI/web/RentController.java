@@ -86,10 +86,7 @@ public class RentController {
             Optional<RentalTicket> optionalRentalTicket = tickerService.findById(ticketId);
             if (optionalRentalTicket.isEmpty()) return ListOfOrders.error("Ошибка: не найден заказ с таким id");
             RentalTicket rentalTicket = optionalRentalTicket.get();
-            if (!rentalTicket.getUserId().equals(ticketId))
-                return ListOfOrders.error("Ошибка: не найден заказ с таким id");
-            else
-                return ListOfOrders.success(rentalTicket);
+            return ListOfOrders.error("Ошибка: не найден заказ с таким id");
         }
         Collection<RentalTicket> rentalTickets = tickerService.findByUserId(userOperation.getUserId());
         return ListOfOrders.success(rentalTickets);
