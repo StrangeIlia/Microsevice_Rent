@@ -7,6 +7,8 @@ import bstu.BI.service.UserService;
 import bstu.BI.util.Verificator;
 import bstu.BI.web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,32 +28,46 @@ public class RentController {
     RentalTickerService tickerService;
 
     @PostMapping("/create-order")
-    public UserResponse createOrder(@RequestBody @Valid DTO_Rent_CreateOrder data) {
+    public ResponseEntity<UserResponse> createOrder(@RequestBody @Valid DTO_Rent_CreateOrder data) {
         UserRequisites requisites = data.getRequisites();
-        Integer bookTypeId = data.getBookTypeId();
+        long bookTypeId = data.getBookTypeId();
         Date rentalFinish = data.getRentalFinish();
-        if (!Verificator.validPeriod(new Date(), rentalFinish))
-            return UserResponse.error("Ошибка: период не может быть отрицательным или превышать месяц");
-        Optional<BookService_TransactionInfo> infoOptional = bookService.startTransaction(bookTypeId);
-        if (infoOptional.isEmpty()) return UserResponse.error("Ошибка: не удалось найти книгу такого типа");
-        BookService_TransactionInfo info = infoOptional.get();
-        RentalTicket rentalTicket = info.getRentalTicket();
-        UserOperation userOperation = userService.transactions(requisites, -rentalTicket.getPurchasePrice());
-        if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
+        if (!Verificator.validPeriod(new Date(), rentalFinish)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(UserResponse.error("Ошибка: период не может быть отрицательным или превышать месяц"));
+        }
+        BookServiceResponse response = bookService.rentBook(bookTypeId);
+        if (response.isFail()) {
+            return ResponseEntity
+                    .status(response.getStatus())
+                    .body(UserResponse.error("Ошибка: не удалось найти книгу такого типа"));
+        }
+        RentalTicket rentalTicket = response.getRentalTicket();
+        UserServiceResponse userOperation = userService.transactions(requisites, -rentalTicket.getPurchasePrice());
+        if (userOperation.isFail()) {
+            bookService.returnBook(bookTypeId);
+            return ResponseEntity
+                    .status(userOperation.getStatus())
+                    .body(UserResponse.error(userOperation.getExplanation()));
+        }
         rentalTicket.setBookTypeId(bookTypeId);
         rentalTicket.setRentalFinish(rentalFinish);
         rentalTicket.setUserId(userOperation.getUserId());
         tickerService.save(rentalTicket);
-        bookService.finishTransaction(info);
-        return UserResponse.success();
+        return ResponseEntity.ok(UserResponse.success());
     }
 
     @PostMapping("/refund-of-deposit")
-    public UserResponse refundOfDeposit(@RequestBody @Valid DTO_Rent_RefundOfDeposit data) {
+    public ResponseEntity<UserResponse> refundOfDeposit(@RequestBody @Valid DTO_Rent_RefundOfDeposit data) {
         UserRequisites requisites = data.getRequisites();
-        Integer bookTypeId = data.getBookTypeId();
-        UserOperation userOperation = userService.getInfo(requisites.getUsername());
-        if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
+        Long bookTypeId = data.getBookTypeId();
+        UserServiceResponse userOperation = userService.getInfo(requisites.getUsername());
+        if (userOperation.isFail()) {
+            return ResponseEntity
+                    .status(userOperation.getStatus())
+                    .body(UserResponse.error(userOperation.getExplanation()));
+        }
         Collection<RentalTicket> rentalBooks = tickerService.findByUserId(userOperation.getUserId());
         RentalTicket[] massive = (RentalTicket[]) rentalBooks.stream()
                 .filter(x -> x.getBookTypeId().equals(bookTypeId))
@@ -67,28 +83,35 @@ public class RentController {
                 break;
             }
         }
-        if (optionalRentalTicket.isEmpty()) return UserResponse.error("Ошибка: не найден заказ с такой книгой");
+
+        if (optionalRentalTicket.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(UserResponse.error("Ошибка: не найден заказ с такой книгой"));
+        }
+
         userOperation = userService.transactions(requisites,
                 optionalRentalTicket.get().getPurchasePrice() - optionalRentalTicket.get().getRentPrice());
-        if (userOperation.isFail()) return UserResponse.error(userOperation.getExplanation());
-        bookService.bookReturn(optionalRentalTicket.get().getBookTypeId());
+        if (userOperation.isFail()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(UserResponse.error(userOperation.getExplanation()));
+        }
+        bookService.returnBook(optionalRentalTicket.get().getBookTypeId());
         tickerService.delete(optionalRentalTicket.get());
-        return UserResponse.success();
+        return ResponseEntity.ok(UserResponse.success());
     }
 
     @GetMapping("list-of-orders")
     public ListOfOrders getListOfOrders(@RequestParam String username,
                                         @RequestParam(required = false) Integer ticketId) {
-        UserOperation userOperation = userService.getInfo(username);
+        UserServiceResponse userOperation = userService.getInfo(username);
         if (userOperation.isFail()) return ListOfOrders.error(userOperation.getExplanation());
         if (Optional.ofNullable(ticketId).isPresent()) {
             Optional<RentalTicket> optionalRentalTicket = tickerService.findById(ticketId);
             if (optionalRentalTicket.isEmpty()) return ListOfOrders.error("Ошибка: не найден заказ с таким id");
             RentalTicket rentalTicket = optionalRentalTicket.get();
-            if (!rentalTicket.getUserId().equals(ticketId))
-                return ListOfOrders.error("Ошибка: не найден заказ с таким id");
-            else
-                return ListOfOrders.success(rentalTicket);
+            return ListOfOrders.success(rentalTicket);
         }
         Collection<RentalTicket> rentalTickets = tickerService.findByUserId(userOperation.getUserId());
         return ListOfOrders.success(rentalTickets);

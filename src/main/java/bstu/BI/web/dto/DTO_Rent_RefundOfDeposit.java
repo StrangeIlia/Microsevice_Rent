@@ -9,5 +9,5 @@ public class DTO_Rent_RefundOfDeposit {
     @NotNull
     UserRequisites requisites;
     @NotNull
-    Integer bookTypeId;
+    Long bookTypeId;
 }

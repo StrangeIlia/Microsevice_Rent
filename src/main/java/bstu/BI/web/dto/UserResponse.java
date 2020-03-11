@@ -1,24 +1,18 @@
 package bstu.BI.web.dto;
 
-import bstu.BI.entity.enums.Status;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class UserResponse {
-    private Status status;
     private String explanation;
 
-    UserResponse(Status status) {
-        this.status = status;
-    }
-
     public static UserResponse success() {
-        return new UserResponse(Status.SUCCESS);
+        return new UserResponse(null);
     }
 
     public static UserResponse error(String explanation) {
-        UserResponse response = new UserResponse(Status.FAIL);
-        response.setExplanation(explanation);
-        return response;
+        return new UserResponse(explanation);
     }
 }

@@ -1,7 +1,6 @@
 package bstu.BI.web.dto;
 
 import bstu.BI.entity.domain.RentalTicket;
-import bstu.BI.entity.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
@@ -11,17 +10,14 @@ import java.util.List;
 
 @Getter
 public class ListOfOrders {
-    private Status status;
     private String explanation;
     private Collection<RentalTicket> orders;
 
     ListOfOrders(Collection<RentalTicket> orders) {
-        this.status = Status.SUCCESS;
         this.orders = orders;
     }
 
     ListOfOrders(String explanation) {
-        this.status = Status.FAIL;
         this.explanation = explanation;
     }
 

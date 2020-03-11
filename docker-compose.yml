@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   mysql:
     image: mysql:8.0
@@ -11,6 +11,9 @@ services:
       - MYSQL_PASSWORD=secret
     ports:
       - "3308:3306"
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER
+      timeout: 20s
     restart: always
 
   rent:

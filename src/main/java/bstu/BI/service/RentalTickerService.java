@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface RentalTickerService {
     Optional<RentalTicket> findById(Integer ticketId);
 
-    Collection<RentalTicket> findByUserId(Integer userId);
+    Collection<RentalTicket> findByUserId(Long userId);
 
     boolean save(RentalTicket rentalTicket);
 

@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Collection;
 
 public interface RentalTickerRepository extends CrudRepository<RentalTicket, Integer> {
-    Collection<RentalTicket> findByUserId(Integer userId);
+    Collection<RentalTicket> findByUserId(Long userId);
 }

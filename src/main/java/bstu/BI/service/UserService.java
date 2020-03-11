@@ -1,10 +1,10 @@
 package bstu.BI.service;
 
-import bstu.BI.web.dto.UserOperation;
 import bstu.BI.web.dto.UserRequisites;
+import bstu.BI.web.dto.UserServiceResponse;
 
 public interface UserService {
-    UserOperation getInfo(String username);
+    UserServiceResponse getInfo(String username);
 
-    UserOperation transactions(UserRequisites requisites, Double cost);
+    UserServiceResponse transactions(UserRequisites requisites, Double cost);
 }

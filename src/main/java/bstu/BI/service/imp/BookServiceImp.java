@@ -1,34 +1,42 @@
 package bstu.BI.service.imp;
 
-import bstu.BI.entity.enums.BookService_Operation;
+import bstu.BI.entity.domain.RentalTicket;
 import bstu.BI.service.BookService;
 import bstu.BI.service.ExternalBookService;
-import bstu.BI.util.Converter;
-import bstu.BI.web.dto.BookService_Response;
-import bstu.BI.web.dto.BookService_TransactionInfo;
+import bstu.BI.web.dto.BookServiceResponse;
+import bstu.BI.web.dto.DTO_BookService_Info;
+import bstu.BI.web.dto.DTO_RentBook;
+import bstu.BI.web.dto.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class BookServiceImp implements BookService {
     @Autowired
-    ExternalBookService externalBookService;
+    ExternalBookService bookService;
 
     @Override
-    public Optional<BookService_TransactionInfo> startTransaction(Integer bookTypeId) {
-        BookService_Response response = externalBookService.operation(bookTypeId, BookService_Operation.GET_BOOK);
-        return Optional.ofNullable(Converter.convert(response));
+    public BookServiceResponse rentBook(Long bookTypeId) {
+        ResponseEntity<DTO_BookService_Info> responseEntity =
+                bookService.bookOperation(DTO_RentBook.buyOne(bookTypeId));
+        if (!responseEntity.getStatusCode().equals(HttpStatus.OK))
+            return BookServiceResponse.create(responseEntity.getStatusCode());
+        else {
+            DTO_BookService_Info response = responseEntity.getBody();
+            RentalTicket ticket = new RentalTicket();
+            ticket.setRentPrice(response.getRentPrice());
+            ticket.setPurchasePrice(response.getPurchasePrice());
+            ticket.setBookTypeId(bookTypeId);
+            return BookServiceResponse.create(ticket);
+        }
     }
 
     @Override
-    public void finishTransaction(BookService_TransactionInfo transactionInfo) {
-        externalBookService.transaction(transactionInfo.getTransactionId());
-    }
-
-    @Override
-    public void bookReturn(Integer bookTypeId) {
-        externalBookService.operation(bookTypeId, BookService_Operation.PUSH_BOOK);
+    public ServiceResponse returnBook(Long bookTypeId) {
+        ResponseEntity<DTO_BookService_Info> responseEntity =
+                bookService.bookOperation(DTO_RentBook.buyOne(bookTypeId));
+        return ServiceResponse.create(responseEntity.getStatusCode());
     }
 }
