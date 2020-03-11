@@ -21,9 +21,8 @@ services:
     volumes:
       - ./app:/app
       - ~/m2:/root/.m2
-    restart: always
     environment:
       WAIT_HOST: mysql:3306
     depends_on:
       - mysql
-    command: mvn clean string-boot:run -Dspring-boot.run.profiles=container
+    restart: always

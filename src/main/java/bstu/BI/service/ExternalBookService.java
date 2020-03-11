@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "book-service", url = "http://localhost:50001/api/test/book-service")
+@FeignClient(name = "book-service", url = "${book_service}")
 public interface ExternalBookService {
     @PostMapping("/operation")
     BookService_Response operation(@RequestParam("bookTypeId") Integer bookTypeId,

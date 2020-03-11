@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
-@FeignClient(name = "user-service", url = "http://localhost:50001/api/test/user-service")
+@FeignClient(name = "user-service", url = "${user_service}")
 public interface ExternalUserService {
     @GetMapping("/info")
     UserOperation getInfo(@RequestParam String username);

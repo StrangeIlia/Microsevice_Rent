@@ -4,5 +4,5 @@ docker run --name mysql-standalone
 docker build . -t rent_service
 docker run -p 50001:50001 --name rent_service --link microservices_mysql:mysql -d rent_service
 
-
+9056714869
 

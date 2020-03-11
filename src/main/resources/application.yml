@@ -12,6 +12,9 @@ spring:
 server:
   port: 50001
 
+user_service: http://localhost:50001/api/test/user-service
+book_service: http://localhost:50001/api/test/book-service
+
 ---
 spring:
   profiles: container
