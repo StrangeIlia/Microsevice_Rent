@@ -26,3 +26,5 @@ services:
     depends_on:
       - mysql
     restart: always
+    expose:
+      - 50001
