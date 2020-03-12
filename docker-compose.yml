@@ -29,5 +29,5 @@ services:
       - "50001"
     ports:
       - "50001:50001"   
-    command: mvn clean spring-boot:run -Dspring-boot.profiles=docker
+    command: sleep 3m && java -jar", app/target/Rent-1.0.jar
     restart: always
