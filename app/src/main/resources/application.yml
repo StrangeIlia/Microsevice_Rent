@@ -1,0 +1,17 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: ilya
+    password: secret
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    database: mysql
+    hibernate:
+      ddl-auto: create-drop
+server:
+  port: 50001
+
+user_service: http://localhost:50001/api/test/user-service
+book_service: http://localhost:50001/api/test/book-service

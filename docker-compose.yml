@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   mysql:
     image: mysql:8.0
@@ -16,15 +16,18 @@ services:
   rent:
     image: rent_service
     container_name: docker_rent
-    build: ./
+    environment:
+      WAIT_HOSTS: mysql:3306
+    build: ./app
     working_dir: /app
     volumes:
       - ./app:/app
       - ~/m2:/root/.m2
-    environment:
-      WAIT_HOST: mysql:3306
     depends_on:
       - mysql
-    restart: always
     expose:
-      - 50001
+      - "50001"
+    ports:
+      - "50001:50001"   
+    command: mvn clean spring-boot:run -Dspring-boot.profiles=docker
+    restart: always
