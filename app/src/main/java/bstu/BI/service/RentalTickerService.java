@@ -10,6 +10,8 @@ public interface RentalTickerService {
 
     Collection<RentalTicket> findByUserId(Long userId);
 
+    Optional<RentalTicket> findAndRemoveOld(Long userId, Long bookTypeId);
+
     boolean save(RentalTicket rentalTicket);
 
     void delete(RentalTicket rentalTicket);

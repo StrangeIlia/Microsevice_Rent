@@ -1,4 +1,4 @@
-package bstu.BI.web.dto;
+package bstu.BI.web.dto.user_service;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DTO_UserService_Transaction {
     @NotNull
-    UserRequisites requisites;
+    DTO_UserService_UserRequisites requisites;
     @NotNull
     Double cost;
 }

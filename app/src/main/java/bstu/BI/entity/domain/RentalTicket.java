@@ -28,4 +28,14 @@ public class RentalTicket {
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date rentalFinish;
+
+    @JsonIgnore
+    public Double getRentAndDepositCost() {
+        return getPurchasePrice();
+    }
+
+    @JsonIgnore
+    public Double getDeposit(){
+        return getPurchasePrice() - getRentPrice();
+    }
 }

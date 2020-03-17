@@ -1,10 +1,11 @@
 package bstu.BI.service;
 
-import bstu.BI.web.dto.UserOperation;
-import bstu.BI.web.dto.UserRequisites;
+import bstu.BI.web.dto.user_service.DTO_UserService_UserRequisites;
+
+import java.util.Optional;
 
 public interface UserService {
-    UserOperation getInfo(String username);
+    Optional<Long> getInfo(String username);
 
-    UserOperation transactions(UserRequisites requisites, Double cost);
+    Optional<Long> transactions(DTO_UserService_UserRequisites requisites, Double cost);
 }

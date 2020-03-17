@@ -6,8 +6,7 @@ import bstu.BI.service.RentalTickerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RentalTicketServiceImp implements RentalTickerService {
@@ -22,6 +21,30 @@ public class RentalTicketServiceImp implements RentalTickerService {
     @Override
     public Collection<RentalTicket> findByUserId(Long userId) {
         return tickerRepository.findByUserId(userId);
+    }
+
+    @Override
+    public Optional<RentalTicket> findAndRemoveOld(Long userId, Long bookTypeId) {
+        Collection<RentalTicket> rentalBooks = tickerRepository.findByUserId(userId);
+        Iterator<RentalTicket> iterator = rentalBooks.stream()
+                .filter(x -> x.getBookTypeId().equals(bookTypeId))
+                .sorted(Comparator.comparing(RentalTicket::getRentalFinish))
+                .iterator();
+        Optional<RentalTicket> optionalRentalTicket = Optional.empty();
+        Date currentDate = new Date();
+        while(iterator.hasNext())
+        {
+            RentalTicket ticket = iterator.next();
+            Date finish = ticket.getRentalFinish();
+            int result = currentDate.compareTo(finish);
+            if (result > 0)
+                delete(ticket);
+            else {
+                optionalRentalTicket = Optional.of(ticket);
+                break;
+            }
+        }
+        return optionalRentalTicket;
     }
 
     @Override

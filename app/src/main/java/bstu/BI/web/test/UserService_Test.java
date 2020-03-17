@@ -1,9 +1,8 @@
 package bstu.BI.web.test;
 
-import bstu.BI.entity.enums.Status;
-import bstu.BI.web.dto.DTO_UserService_Transaction;
-import bstu.BI.web.dto.UserOperation;
-import bstu.BI.web.dto.UserRequisites;
+import bstu.BI.web.dto.user_service.DTO_UserService_Transaction;
+import bstu.BI.web.dto.user_service.DTO_UserService_UserRequisites;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,34 +24,23 @@ public class UserService_Test {
     }
 
     @GetMapping("/info")
-    public UserOperation getInfo(@RequestParam String username) {
+    public ResponseEntity<Long> getInfo(@RequestParam String username) {
         this.init();
-        Long id = userRequisites.get(username);
-        UserOperation userOperation = new UserOperation();
-        if (Optional.ofNullable(id).isEmpty()) {
-            userOperation.setStatus(Status.FAIL);
-            userOperation.setExplanation("Нет пользователя с таким логином");
-        } else {
-            userOperation.setStatus(Status.SUCCESS);
-            userOperation.setUserId(id);
+        try {
+            return ResponseEntity.ok(userRequisites.get(username));
+        } catch (Exception ignored) {
+            return ResponseEntity.notFound().build();
         }
-        return userOperation;
     }
 
     @PutMapping("/transactions")
-    public UserOperation transactions(@RequestBody @Valid DTO_UserService_Transaction data) {
-        UserRequisites requisites = data.getRequisites();
+    public ResponseEntity<Long> transactions(@RequestBody @Valid DTO_UserService_Transaction data) {
+        DTO_UserService_UserRequisites requisites = data.getRequisites();
         Double cost = data.getCost();
-        this.init();
-        Long id = userRequisites.get(requisites.getUsername());
-        UserOperation userOperation = new UserOperation();
-        if (Optional.ofNullable(id).isEmpty()) {
-            userOperation.setStatus(Status.FAIL);
-            userOperation.setExplanation("Нет пользователя с таким логином");
-        } else {
-            userOperation.setStatus(Status.SUCCESS);
-            userOperation.setUserId(id);
+        try {
+            return ResponseEntity.ok(userRequisites.get(requisites.getUsername()));
+        } catch (Exception ignored) {
+            return ResponseEntity.notFound().build();
         }
-        return userOperation;
     }
 }

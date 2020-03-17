@@ -3,9 +3,11 @@ package bstu.BI.service.imp;
 import bstu.BI.entity.domain.RentalTicket;
 import bstu.BI.service.BookService;
 import bstu.BI.service.ExternalBookService;
-import bstu.BI.web.dto.BookService_Response;
-import bstu.BI.web.dto.DTO_RentBook;
+import bstu.BI.web.dto.book_service.DTO_BookService_Operation;
+import bstu.BI.web.dto.book_service.DTO_BookService_Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,8 +19,15 @@ public class BookServiceImp implements BookService {
 
     @Override
     public Optional<RentalTicket> buyOne(Long bookTypeId) {
-        DTO_RentBook rentBook = new DTO_RentBook(bookTypeId, -1L);
-        BookService_Response response = externalBookService.operation(rentBook);
+        DTO_BookService_Operation operation =
+                new DTO_BookService_Operation(bookTypeId, 1L);
+        ResponseEntity<DTO_BookService_Response> responseEntity =
+                externalBookService.bookSub(operation);
+        if(!responseEntity.getStatusCode().equals(HttpStatus.OK))
+            return Optional.empty();
+        DTO_BookService_Response response = responseEntity.getBody();
+        if(response == null)
+            return Optional.empty();
         RentalTicket ticket = new RentalTicket();
         ticket.setBookTypeId(bookTypeId);
         ticket.setRentPrice(response.getRentPrice());
@@ -28,8 +37,8 @@ public class BookServiceImp implements BookService {
 
     @Override
     public boolean returnOne(Long bookTypeId) {
-        DTO_RentBook rentBook = new DTO_RentBook(bookTypeId, 1L);
-        BookService_Response response = externalBookService.operation(rentBook);
-        return response.isSuccess();
+        DTO_BookService_Operation operation =
+                new DTO_BookService_Operation(bookTypeId, 1L);
+        return externalBookService.bookSub(operation).getStatusCode().equals(HttpStatus.OK);
     }
 }
