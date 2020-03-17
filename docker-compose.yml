@@ -1,4 +1,4 @@
-version: '3'
+version: "3.7"
 services:
   mysql:
     image: mysql:8.0
@@ -11,23 +11,18 @@ services:
       - MYSQL_PASSWORD=secret
     ports:
       - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 30s 
+      interval: 30s
     restart: always
 
   rent:
     image: rent_service
     container_name: docker_rent
-    environment:
-      WAIT_HOSTS: mysql:3306
-    build: ./app
-    working_dir: /app
-    volumes:
-      - ./app:/app
-      - ~/m2:/root/.m2
     depends_on:
       - mysql
-    expose:
-      - "50001"
     ports:
-      - "50001:50001"   
-    command: sleep 3m && java -jar", app/target/Rent-1.0.jar
+      - "50001:50001"
+    command: wait-for-it.sh mysql:3306 && java -jar Rent-1.0.jar
     restart: always
